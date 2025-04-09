@@ -2,9 +2,14 @@
 
 Machine Learning models for electricity price, load, generation and weather forecasting.
 
-# Table of Contents
+## Table of Contents
 
-Coming soon...
+1. [Introduction](#introduction)
+2. [Installation](#installation)
+3. [Models and applications](#models-and-applications)
+4. [Datasets](#datasets)
+5. [Deployment](#deployment)
+6. [Licence](#licence)
 
 ## Introduction
 
