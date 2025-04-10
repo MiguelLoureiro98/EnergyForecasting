@@ -39,7 +39,7 @@ The following table presents the problems that are to be solved by the models, a
 
 ## Datasets
 
-All the datasets used in this work are publicly available and can be easily download from the Kaggle repository:
+All the datasets used in this work are publicly available and can be easily downloaded from the Kaggle repository (with the exception of 8, which is available via GitHub):
 
 1. [Hourly electricy prices, consumption, generation and weather - Spain](https://www.kaggle.com/datasets/nicholasjhana/energy-consumption-generation-prices-and-weather)
 2. [Western Europe Power Consumption](https://www.kaggle.com/datasets/francoisraucent/western-europe-power-consumption?select=nl.csv)
