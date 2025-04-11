@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools >= 77.0.3"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "energy_forecasting_scripts"
+version = "0.1.0"
+authors = [
+    {name = "Miguel Santos Loureiro", email = "miguel.santos.loureiro@gmail.com"}
+]
+description = "Helper scripts for energy forecasting problems."
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.10"
+dependencies = [
+    "numpy==1.26.3",
+    "pandas==2.2.3",
+    "matplotlib==3.10.0"
+]
+
+[project.urls]
+repository = "https://github.com/MiguelLoureiro98/EnergyForecasting"
+
+[tool.setuptools.packages.find]
+where=["src"]
+include=["scripts"]
