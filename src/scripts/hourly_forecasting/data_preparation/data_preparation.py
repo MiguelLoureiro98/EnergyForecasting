@@ -2,6 +2,14 @@ import pandas as pd
 
 """
 This file contains date/time conversion and generic data preparation functions.
+
+Functions
+---------
+create_tz_column
+    Introduce a time zone indicator variable.
+
+datetime_conversion
+    Convert the data frame's index to a datetime object.
 """
 
 def create_tz_column(data: pd.DataFrame) -> pd.DataFrame:
@@ -44,5 +52,6 @@ def datetime_conversion(data: pd.DataFrame) -> pd.DataFrame:
     new_data = data.copy();
 
     new_data["time"] = pd.to_datetime(new_data["time"], utc=True);
+    new_data = new_data.set_index("time");
 
     return new_data;
