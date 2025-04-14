@@ -6,15 +6,15 @@ This file contains date/time conversion and generic data preparation functions.
 Functions
 ---------
 create_tz_column
-    Introduce a time zone indicator variable.
+    Creates a time zone indicator variable.
 
 datetime_conversion
-    Convert the data frame's index to a datetime object.
+    Converts the data frame's index to a datetime object.
 """
 
 def create_tz_column(data: pd.DataFrame) -> pd.DataFrame:
     """
-    Creates a time zone indicator column and add it to the data frame.
+    Creates a time zone indicator column and adds it to the data frame.
 
     Parameters
     ----------
