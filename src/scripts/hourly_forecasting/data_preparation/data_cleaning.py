@@ -2,7 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 """
-This file contains several data cleaning functions.
+This module contains several data cleaning functions.
 
 Functions
 ---------
