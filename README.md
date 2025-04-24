@@ -17,7 +17,22 @@ This project is focused on energy modelling, more specifically on the developmen
 
 ## Installation
 
-A project configuration file will soon be added to the repository. When that happens, installation instructions via Github will be provided here.
+Notebook and script dependencies can be installed using the project configuration file.
+
+To do so, clone the repository:
+
+'''
+git clone https://github.com/MiguelLoureiro98/EnergyForecasting.git
+'''
+
+Then, move into the repository folder and install dependencies using pip:
+
+'''
+cd EnergyForecasting
+pip install .
+'''
+
+This is required if you wish to run any notebooks or scripts from the [src](src/) folder.
 
 ## Models and Applications
 
