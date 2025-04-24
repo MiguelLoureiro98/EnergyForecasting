@@ -21,16 +21,16 @@ Notebook and script dependencies can be installed using the project configuratio
 
 To do so, clone the repository:
 
-'''
+```
 git clone https://github.com/MiguelLoureiro98/EnergyForecasting.git
-'''
+```
 
 Then, move into the repository folder and install dependencies using pip:
 
-'''
+```
 cd EnergyForecasting
 pip install .
-'''
+```
 
 This is required if you wish to run any notebooks or scripts from the [src](src/) folder.
 
