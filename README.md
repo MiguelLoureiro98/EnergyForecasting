@@ -32,7 +32,7 @@ cd EnergyForecasting
 pip install .
 ```
 
-This is required if you wish to run any notebooks or scripts from the [src](src/) folder.
+This is required if you wish to run any of the notebooks or scripts in the [src](src/) folder.
 
 ## Models and Applications
 

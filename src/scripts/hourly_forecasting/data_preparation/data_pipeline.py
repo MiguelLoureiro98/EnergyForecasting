@@ -44,8 +44,12 @@ def prepare_data_forecasting(energy_data: pd.DataFrame, weather_data: pd.DataFra
     new_weather_list = [new_weather_data.groupby("city_name").get_group(city) for city in new_weather_data["city_name"].unique()];
     weather_list_no_dups = [df.loc[(~df.index.duplicated()).tolist()] for df in new_weather_list];
     
-    
-
-    new_data = 0;
+    # Concatenate data frames
+    old_names_list = [df.columns.tolist() for df in weather_list_no_dups];
+    city_names = [df["city_name"].unique().item() for df in weather_list_no_dups];
+    new_names_list = [[name + city_name for name in cols] for cols, city_name in zip(old_names_list, city_names)];
+    name_dicts = [[{old_name: new_name} for old_name, new_name in zip(old_cols, new_cols)] for old_cols, new_cols in zip(old_names_list, new_names_list)];
+    weather_list_no_dups_new_cols = [df.rename(name_dict) for df, name_dict in zip(weather_list_no_dups, name_dicts)];
+    new_data = pd.concat(weather_list_no_dups_new_cols, axis=1);
 
     return new_data;
