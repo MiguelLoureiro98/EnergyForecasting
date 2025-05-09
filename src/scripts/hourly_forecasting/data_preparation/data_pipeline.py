@@ -70,4 +70,7 @@ def prepare_data_forecasting(energy_data: pd.DataFrame, weather_data: pd.DataFra
     null_nan_cols = [col for col in new_data.columns if new_data[col].unique().shape[0] == 2 and np.isnan(new_data[col].unique()).any() == True];
     new_data = new_data.drop(columns=null_nan_cols);
 
+    # Remove local tz columns
+    new_data = new_data.drop(columns=new_data.columns[new_data.columns.str.contains("tz")][1:]);
+
     return new_data;
