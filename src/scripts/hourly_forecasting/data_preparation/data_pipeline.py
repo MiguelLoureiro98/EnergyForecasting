@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 from scripts.hourly_forecasting.data_preparation.data_preparation import create_tz_column, datetime_conversion
 from scripts.hourly_forecasting.data_preparation.data_cleaning import show_na, plot_na
@@ -59,5 +60,14 @@ def prepare_data_forecasting(energy_data: pd.DataFrame, weather_data: pd.DataFra
 
     # Concatenate energy and weather data frames
     new_data = pd.concat([new_energy_data, processed_weather_data], axis=1);
+
+    # Remove constant columns
+    new_data = new_data.dropna(how="all", axis=1);
+    constant_cols = (new_data == new_data.iloc[0]).all(skipna=True);
+    new_data = new_data.drop(columns=constant_cols.loc[constant_cols == True].index.tolist());
+
+    # Remove columns consisting only of zero and NaN values
+    null_nan_cols = [col for col in new_data.columns if new_data[col].unique().shape[0] == 2 and np.isnan(new_data[col].unique()).any() == True];
+    new_data = new_data.drop(columns=null_nan_cols);
 
     return new_data;
