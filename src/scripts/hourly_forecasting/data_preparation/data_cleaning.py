@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
@@ -97,11 +98,13 @@ def missing_data_report(data: pd.DataFrame) -> None:
                      .sort_values(ascending=False)\
                      .plot(kind="bar", rot=90, title="Missing data points per column", xlabel="Features", ylabel="# Missing values");
     ax.bar_label(ax.containers[0]);
+    plt.show();
 
     missing_data_pct = missing_data / data.shape[0];
     ax2 = missing_data_pct.loc[missing_data > 0]\
                      .sort_values(ascending=False)\
                      .plot(kind="bar", rot=90, title="Percentage of missing data points per column", xlabel="Features", ylabel="% Missing values");
-    ax2.bar_label(ax2.containers[0]);
+    ax2.bar_label(ax2.containers[0], rotation=90, fmt="{:.4f}");
+    plt.show();
 
     return;
