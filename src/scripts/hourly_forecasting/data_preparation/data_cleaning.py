@@ -11,6 +11,9 @@ show_na
 
 plot_na
     Plots missing values.
+
+missing_data_report
+    Produces a complete report on missing data points.
 """
 
 def show_na(data: pd.DataFrame, variable: str) -> pd.DataFrame:
@@ -74,5 +77,31 @@ def plot_na(data: pd.DataFrame, plotted_variable: str, missing_variable: str, fi
     ax.legend();
     ax.grid();
     plt.show();
+
+    return;
+
+def missing_data_report(data: pd.DataFrame) -> None:
+    """
+    Produces a complete report on missing data points.
+
+    _extended_summary_
+
+    Parameters
+    ----------
+    data : pd.DataFrame
+        Forecasting data.
+    """
+
+    missing_data = data.isna().sum();
+    ax = missing_data.loc[missing_data > 0]\
+                     .sort_values(ascending=False)\
+                     .plot(kind="bar", rot=90, title="Missing data points per column", xlabel="Features", ylabel="# Missing values");
+    ax.bar_label(ax.containers[0]);
+
+    missing_data_pct = missing_data / data.shape[0];
+    ax2 = missing_data_pct.loc[missing_data > 0]\
+                     .sort_values(ascending=False)\
+                     .plot(kind="bar", rot=90, title="Percentage of missing data points per column", xlabel="Features", ylabel="% Missing values");
+    ax2.bar_label(ax2.containers[0]);
 
     return;
