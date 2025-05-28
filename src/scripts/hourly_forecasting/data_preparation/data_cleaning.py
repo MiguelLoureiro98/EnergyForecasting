@@ -86,7 +86,9 @@ def missing_data_report(data: pd.DataFrame) -> None:
     """
     Produces a complete report on missing data points.
 
-    _extended_summary_
+    This function produces a plot displaying the amount of missing values per variable (only variables with missing
+    values are considered). It also produces a plot showing the percentage of data points that are missing for each
+    of these variables. 
 
     Parameters
     ----------
