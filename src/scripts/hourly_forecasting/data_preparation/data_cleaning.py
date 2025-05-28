@@ -70,11 +70,12 @@ def plot_na(data: pd.DataFrame, plotted_variable: str, missing_variable: str, fi
     plot_var = data[plotted_variable];
     missing_var = show_na(data, missing_variable);
 
-    ax.plot(plot_var.index, plot_var, label=plotted_variable, c="b");
-    ax.scatter(missing_var.index, missing_var[plotted_variable], label=f"{missing_variable} missing", marker="x", c="r");
+    ax.plot(plot_var.index, plot_var, label=plotted_variable, c="b", alpha=0.5);
+    ax.scatter(missing_var.index, missing_var[plotted_variable], label=f"{missing_variable} missing", marker="X", c="r", linewidths=2);
     ax.set_title(f"Missing values for {missing_variable}");
     ax.set_xlabel("Timestamps");
     ax.set_ylabel(f"{plotted_variable}");
+    ax.tick_params(axis="x", labelrotation=90);
     ax.legend();
     ax.grid();
     plt.show();
@@ -100,7 +101,7 @@ def missing_data_report(data: pd.DataFrame) -> None:
     ax.bar_label(ax.containers[0]);
     plt.show();
 
-    missing_data_pct = missing_data / data.shape[0];
+    missing_data_pct = missing_data / data.shape[0] * 100;
     ax2 = missing_data_pct.loc[missing_data > 0]\
                      .sort_values(ascending=False)\
                      .plot(kind="bar", rot=90, title="Percentage of missing data points per column", xlabel="Features", ylabel="% Missing values");
