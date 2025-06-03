@@ -43,17 +43,50 @@ def construct_features(data: pd.DataFrame) -> pd.DataFrame:
     gen_cols_original = data.columns[data.columns.str.contains("generation")];
 
     # Feature construction
+
+    # Time-based features
     weekday = data.index.to_series().dt.dayofweek;
     hour = (data.index.to_series().dt.hour + data["tz_offset"]).astype("int32");
     new_data = pd.concat([data, weekday, hour]).rename(columns={0: "weekday", 1: "hour"});
 
+    # Production capacity features
     total_capacity = capacity_data[["2015 (MW)", "2016 (MW)", "2017 (MW)", "2018 (MW)"]].sum(axis=0);
-    stable_renewable_capacity = capacity_data.loc[capacity_data["Production Type"].isin(stable_renewables), ["2015 (MW)", "2016 (MW)", "2017 (MW)", "2018 (MW)"]].copy();
-    renewable_capacity = capacity_data.loc[capacity_data["Production Type"].isin(renewables), ["2015 (MW)", "2016 (MW)", "2017 (MW)", "2018 (MW)"]].copy();
+    stable_renewable_capacity = capacity_data.loc[capacity_data["Production Type"].isin(stable_renewables), ["2015 (MW)", "2016 (MW)", "2017 (MW)", "2018 (MW)"]].sum(axis=0).copy();
+    renewable_capacity = capacity_data.loc[capacity_data["Production Type"].isin(renewables), ["2015 (MW)", "2016 (MW)", "2017 (MW)", "2018 (MW)"]].sum(axis=0).copy();
 
+    year = data.index.to_series().dt.year;
+    new_data = pd.concat([new_data, year]).rename(columns={0: "year"});
+
+    capacity_mapping = {2014: total_capacity["2015 (MW)"], 
+                        2015: total_capacity["2015 (MW)"],
+                        2016: total_capacity["2016 (MW)"],
+                        2017: total_capacity["2017 (MW)"],
+                        2018: total_capacity["2018 (MW)"]};
+    stable_renewables_mapping = {2014: stable_renewable_capacity["2015 (MW)"], 
+                                 2015: stable_renewable_capacity["2015 (MW)"],
+                                 2016: stable_renewable_capacity["2016 (MW)"],
+                                 2017: stable_renewable_capacity["2017 (MW)"],
+                                 2018: stable_renewable_capacity["2018 (MW)"]};
+    renewables_mapping = {2014: renewable_capacity["2015 (MW)"], 
+                          2015: renewable_capacity["2015 (MW)"],
+                          2016: renewable_capacity["2016 (MW)"],
+                          2017: renewable_capacity["2017 (MW)"],
+                          2018: renewable_capacity["2018 (MW)"]};
+    
+    new_data["capacity"] = new_data["year"].map(capacity_mapping);
+    new_data["stable_renewable_capacity"] = new_data["year"].map(stable_renewables_mapping);
+    new_data["renewable_capacity"] = new_data["year"].map(renewables_mapping);
+
+    new_data = new_data.drop(columns=["year"]);
+
+    # Generation features
     total_gen = data[gen_cols_original].sum(axis=1);
     stable_renewable_gen = data[stable_renewables_original].sum(axis=1);
     renewable_gen = data[renewables_original].sum(axis=1);
     new_data = pd.concat([new_data, total_gen, stable_renewable_gen, renewable_gen]).rename(columns={0: "total_gen", 1: "stable_renweable_gen", 2: "renewable_gen"});
+
+    # Renewables share features
+
+    # Margin features
 
     return new_data;
