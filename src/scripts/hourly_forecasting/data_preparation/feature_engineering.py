@@ -9,6 +9,9 @@ Functions
 ---------
 construct_features
     Constructs features from one or more raw features.
+
+discard_features
+    Discards unusable or redundant features.
 """
 
 def construct_features(data: pd.DataFrame) -> pd.DataFrame:
