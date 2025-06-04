@@ -90,11 +90,18 @@ def construct_features(data: pd.DataFrame) -> pd.DataFrame:
     # Supply & demand features
     new_data["excess_demand"] = new_data["total load actual"] - new_data["total_gen"];
     new_data["demand_supply_ratio"] = new_data["total load actual"] / new_data["total_gen"];
+    new_data["coverage"] = (new_data["capacity"] - new_data["total_gen"]) / new_data["total load actual"];
+    new_data["excess_coverage"] = (new_data["capacity"] - new_data["total_gen"]) / new_data["excess_demand"];
 
     # Renewables share features
     new_data["renewables_share"] = new_data["renewable_gen"] / new_data["total_gen"];
     new_data["renewable_utilisation_ratio"] = new_data["renewable_gen"] / new_data["renewable_capacity"];
     new_data["stable_renewable_utilisation_ratio"] = new_data["stable_renewable_gen"] / new_data["stable_renewable_capacity"];
+    
+    new_data["renewable_coverage"] = (new_data["renewable_capacity"] - new_data["renewable_gen"]) / new_data["total load actual"];
+    new_data["stable_renewable_coverage"] = (new_data["stable_renewable_capacity"] - new_data["stable_renewable_gen"]) / new_data["total load actual"];
+    new_data["excess_renewable_coverage"] = (new_data["renewable_capacity"] - new_data["renewable_gen"]) / new_data["excess_demand"];
+    new_data["excess_stable_renewable_coverage"] = (new_data["stable_renewable_capacity"] - new_data["stable_renewable_gen"]) / new_data["excess_demand"];
 
     # Margin features
     new_data["reserve_margin"] = new_data["capacity"] - new_data["total load actual"];
