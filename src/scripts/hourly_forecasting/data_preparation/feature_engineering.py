@@ -140,7 +140,8 @@ def discard_features(data: pd.DataFrame) -> pd.DataFrame:
     new_data = data.copy();
 
     new_data = new_data.drop(columns=new_data.columns[new_data.columns.str.contains("weather")].to_list());
-    new_data = new_data.drop(columns=new_data.columns[new_data.columns.str.contains("min")].to_list);
-    new_data = new_data.drop(columns=new_data.columns[new_data.columns.str.contains("max")].to_list);
+    new_data = new_data.drop(columns=new_data.columns[new_data.columns.str.contains("min")].to_list());
+    new_data = new_data.drop(columns=new_data.columns[new_data.columns.str.contains("max")].to_list());
+    new_data = new_data.drop(columns=["tz_offset"]);
 
     return new_data;
