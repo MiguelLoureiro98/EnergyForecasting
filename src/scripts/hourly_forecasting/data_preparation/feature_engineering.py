@@ -36,7 +36,7 @@ def construct_features(data: pd.DataFrame) -> pd.DataFrame:
 
     # Column name construction
     stable_renewables = ["Hydro Water Reservoir", "Hydro Pumped Storage"];
-    renewables = stable_renewables.extend(["Biomass", "Hydro Run-of-river and poundage", "Waste", "Solar", "Wind Onshore"]);
+    renewables = ["Hydro Water Reservoir", "Hydro Pumped Storage", "Biomass", "Hydro Run-of-river and poundage", "Waste", "Solar", "Wind Onshore"];
     stable_renewables_original = ["generation " + ren.lower() for ren in stable_renewables];
     renewables_original = ["generation " + ren.lower() for ren in renewables];
 
@@ -47,7 +47,7 @@ def construct_features(data: pd.DataFrame) -> pd.DataFrame:
     # Time-based features
     weekday = data.index.to_series().dt.dayofweek;
     hour = (data.index.to_series().dt.hour + data["tz_offset"]).astype("int32");
-    new_data = pd.concat([data, weekday, hour]).rename(columns={0: "weekday", 1: "hour"});
+    new_data = pd.concat([data, weekday, hour], axis=1).rename(columns={0: "weekday", 1: "hour"});
 
     # Production capacity features
     total_capacity = capacity_data[["2015 (MW)", "2016 (MW)", "2017 (MW)", "2018 (MW)"]].sum(axis=0);
@@ -55,7 +55,7 @@ def construct_features(data: pd.DataFrame) -> pd.DataFrame:
     renewable_capacity = capacity_data.loc[capacity_data["Production Type"].isin(renewables), ["2015 (MW)", "2016 (MW)", "2017 (MW)", "2018 (MW)"]].sum(axis=0).copy();
 
     year = data.index.to_series().dt.year;
-    new_data = pd.concat([new_data, year]).rename(columns={0: "year"});
+    new_data = pd.concat([new_data, year], axis=1).rename(columns={0: "year"});
 
     capacity_mapping = {2014: total_capacity["2015 (MW)"], 
                         2015: total_capacity["2015 (MW)"],
@@ -80,10 +80,12 @@ def construct_features(data: pd.DataFrame) -> pd.DataFrame:
     new_data = new_data.drop(columns=["year"]);
 
     # Generation features
-    total_gen = data[gen_cols_original].sum(axis=1);
-    stable_renewable_gen = data[stable_renewables_original].sum(axis=1);
-    renewable_gen = data[renewables_original].sum(axis=1);
-    new_data = pd.concat([new_data, total_gen, stable_renewable_gen, renewable_gen]).rename(columns={0: "total_gen", 1: "stable_renweable_gen", 2: "renewable_gen"});
+    data_copy = data.copy();
+    total_gen = data_copy[gen_cols_original].sum(axis=1);
+    data_copy = data_copy.rename(columns={"generation hydro pumped storage consumption": "generation hydro pumped storage"});
+    stable_renewable_gen = data_copy[stable_renewables_original].sum(axis=1);
+    renewable_gen = data_copy[renewables_original].sum(axis=1);
+    new_data = pd.concat([new_data, total_gen, stable_renewable_gen, renewable_gen], axis=1).rename(columns={0: "total_gen", 1: "stable_renweable_gen", 2: "renewable_gen"});
 
     # Renewables share features
 
