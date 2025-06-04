@@ -85,10 +85,55 @@ def construct_features(data: pd.DataFrame) -> pd.DataFrame:
     data_copy = data_copy.rename(columns={"generation hydro pumped storage consumption": "generation hydro pumped storage"});
     stable_renewable_gen = data_copy[stable_renewables_original].sum(axis=1);
     renewable_gen = data_copy[renewables_original].sum(axis=1);
-    new_data = pd.concat([new_data, total_gen, stable_renewable_gen, renewable_gen], axis=1).rename(columns={0: "total_gen", 1: "stable_renweable_gen", 2: "renewable_gen"});
+    new_data = pd.concat([new_data, total_gen, stable_renewable_gen, renewable_gen], axis=1).rename(columns={0: "total_gen", 1: "stable_renewable_gen", 2: "renewable_gen"});
+
+    # Supply & demand features
+    new_data["excess_demand"] = new_data["total load actual"] - new_data["total_gen"];
+    new_data["demand_supply_ratio"] = new_data["total load actual"] / new_data["total_gen"];
 
     # Renewables share features
+    new_data["renewables_share"] = new_data["renewable_gen"] / new_data["total_gen"];
+    new_data["renewable_utilisation_ratio"] = new_data["renewable_gen"] / new_data["renewable_capacity"];
+    new_data["stable_renewable_utilisation_ratio"] = new_data["stable_renewable_gen"] / new_data["stable_renewable_capacity"];
 
     # Margin features
+    new_data["reserve_margin"] = new_data["capacity"] - new_data["total load actual"];
+    new_data["capacity_utilisation"] = new_data["reserve_margin"] / new_data["capacity"];
+
+    new_data["renewable_margin"] = new_data["renewable_capacity"] - new_data["total load actual"];
+    new_data["renewable_capacity_utilisation"] = new_data["renewable_margin"] / new_data["renewable_capacity"];
+
+    new_data["stable_renewable_margin"] = new_data["stable_renewable_capacity"] - new_data["total load actual"];
+    new_data["stable_renewable_capacity_utilisation"] = new_data["stable_renewable_margin"] / new_data["stable_renewable_capacity"];
+
+    new_data = new_data.drop(columns=["capacity", "renewable_capacity", "stable_renewable_capacity"]);
+
+    return new_data;
+
+
+def discard_features(data: pd.DataFrame) -> pd.DataFrame:
+    """
+    Discards unusable or redundant features.
+
+    This function can be used to discard unusable features, such as the weather description, ID, 
+    or icon, and redundant features, such as the minimum and maximum temperatures (which have the
+    same value as the temperature variable).
+
+    Parameters
+    ----------
+    data : pd.DataFrame
+        Original data.
+
+    Returns
+    -------
+    pd.DataFrame
+        Dataset without unusable features.
+    """
+
+    new_data = data.copy();
+
+    new_data = new_data.drop(columns=new_data.columns[new_data.columns.str.contains("weather")].to_list());
+    new_data = new_data.drop(columns=new_data.columns[new_data.columns.str.contains("min")].to_list);
+    new_data = new_data.drop(columns=new_data.columns[new_data.columns.str.contains("max")].to_list);
 
     return new_data;
