@@ -239,8 +239,8 @@ def hourly_per_month(data: pd.DataFrame, var: str) -> None:
     """
 
     new_data = pd.concat([data, data.index.to_series().dt.month], axis=1).rename(columns={0: "month"});
-    errors = new_data.groupby(["month", "hour"]).std().reset_index().pivot(index="month", columns="hour", values=var);
-    new_data.groupby(["month", "hour"])[var].mean().reset_index().pivot(index="month", columns="hour", values=var).\
-        plot(kind="bar", yerr=errors, capsize=4, title=f"Month - hour plot - {var}", xlabel="Month", ylabel=f"{var}", figsize=(20, 10));
+    #errors = new_data.groupby(["month", "hour"]).std().reset_index().pivot(index="hour", columns="month", values=var);
+    new_data.groupby(["month", "hour"])[var].mean().reset_index().pivot(index="hour", columns="month", values=var).\
+        plot(kind="bar", title=f"Hour - month plot - {var}", xlabel="Hour", ylabel=f"{var}", figsize=(60, 40));
 
     return;
