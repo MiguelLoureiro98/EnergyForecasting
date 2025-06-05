@@ -50,6 +50,7 @@ def construct_features(data: pd.DataFrame) -> pd.DataFrame:
     # Time-based features
     weekday = data.index.to_series().dt.dayofweek;
     hour = (data.index.to_series().dt.hour + data["tz_offset"]).astype("int32");
+    hour = hour.replace({25: 1});
     new_data = pd.concat([data, weekday, hour], axis=1).rename(columns={0: "weekday", 1: "hour"});
 
     # Production capacity features

@@ -152,11 +152,12 @@ def monthly_averages(data: pd.DataFrame, var: str) -> None:
         Variable of interest.
     """
 
-    new_data = data.loc[var].copy();
+    new_data = data[var].copy();
     new_data = pd.concat([new_data, new_data.index.to_series().dt.month], axis=1).\
-               rename(columns={0: "month"}).\
-               groupby("month").mean().\
-               plot(kind="bar", title=f"Average monthly {var}", xlabel="Months", ylabel=f"{var}");
+               rename(columns={0: "month"});
+    errors = new_data.groupby("month").std();
+    new_data.groupby("month").mean().\
+             plot(kind="bar", yerr=errors, capsize=4, title=f"Average monthly {var}", xlabel="Months", ylabel=f"{var}");
 
     return;
 
@@ -176,7 +177,7 @@ def weekday_averages(data: pd.DataFrame, var: str) -> None:
     """
 
     errors = data.groupby("weekday")[var].std();
-    data.groupby("weekday")[var].mean().plot(kind="bar", yerr=errors, title=f"{var} weekday average", xlabel="Weekday", ylabel=f"{var}");
+    data.groupby("weekday")[var].mean().plot(kind="bar", yerr=errors, capsize=4, title=f"{var} weekday average", xlabel="Weekday", ylabel=f"{var}");
 
     return;
 
@@ -196,6 +197,6 @@ def hourly_averages(data: pd.DataFrame, var: str) -> None:
     """
 
     errors = data.groupby("hour")[var].std();
-    data.groupby("hour")[var].mean().plot(kind="bar", yerr=errors, title=f"Average hourly {var}", xlabel="Hours", ylabel=f"{var}");
+    data.groupby("hour")[var].mean().plot(kind="bar", yerr=errors, capsize=4, title=f"Average hourly {var}", xlabel="Hours", ylabel=f"{var}");
 
     return;
