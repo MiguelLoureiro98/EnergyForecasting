@@ -200,3 +200,47 @@ def hourly_averages(data: pd.DataFrame, var: str) -> None:
     data.groupby("hour")[var].mean().plot(kind="bar", yerr=errors, capsize=4, title=f"Average hourly {var}", xlabel="Hours", ylabel=f"{var}");
 
     return;
+
+def weekday_per_month(data: pd.DataFrame, var: str) -> None:
+    """
+    Plots weekday average values per month.
+
+    This function can be used to create bar plots that show the weekday average values for each separate month.
+
+    Parameters
+    ----------
+    data : pd.DataFrame
+        Dataset of interest.
+
+    var : str
+        Variable of interest.
+    """
+
+    new_data = pd.concat([data, data.index.to_series().dt.month], axis=1).rename(columns={0: "month"});
+    errors = new_data.groupby(["month", "weekday"]).std().reset_index().pivot(index="month", columns="weekday", values=var);
+    new_data.groupby(["month", "weekday"])[var].mean().reset_index().pivot(index="month", columns="weekday", values=var).\
+        plot(kind="bar", yerr=errors, capsize=2, title=f"Month - weekday plot - {var}", xlabel="Month", ylabel=f"{var}", figsize=(20, 10));
+
+    return;
+
+def hourly_per_month(data: pd.DataFrame, var: str) -> None:
+    """
+    Plots weekday average values per month.
+
+    This function can be used to create bar plots that show the weekday average values for each separate month.
+
+    Parameters
+    ----------
+    data : pd.DataFrame
+        Dataset of interest.
+
+    var : str
+        Variable of interest.
+    """
+
+    new_data = pd.concat([data, data.index.to_series().dt.month], axis=1).rename(columns={0: "month"});
+    errors = new_data.groupby(["month", "hour"]).std().reset_index().pivot(index="month", columns="hour", values=var);
+    new_data.groupby(["month", "hour"])[var].mean().reset_index().pivot(index="month", columns="hour", values=var).\
+        plot(kind="bar", yerr=errors, capsize=4, title=f"Month - hour plot - {var}", xlabel="Month", ylabel=f"{var}", figsize=(20, 10));
+
+    return;
