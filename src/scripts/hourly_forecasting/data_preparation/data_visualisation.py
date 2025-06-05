@@ -137,3 +137,26 @@ def cross_diff_lag_plot(data: pd.DataFrame, var_x: str, var_y: str, lag_x: int, 
 
     return;
 
+def monthly_averages(data: pd.DataFrame, var: str) -> None:
+    """
+    Plots monthly averages.
+
+    This function can be used to create monthly average plots for a single variable.
+
+    Parameters
+    ----------
+    data : pd.DataFrame
+        Dataset of interest.
+
+    var : str
+        Variable of interest.
+    """
+
+    new_data = data.loc[var].copy();
+    new_data = pd.concat([new_data, new_data.index.to_series().dt.month], axis=1).\
+               rename(columns={0: "month"}).\
+               groupby("month").mean().\
+               plot(kind="bar", title=f"Average monthly {var}", xlabel="Months", ylabel=f"{var}");
+
+    return;
+
