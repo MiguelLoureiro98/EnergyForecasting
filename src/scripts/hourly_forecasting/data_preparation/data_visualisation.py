@@ -160,3 +160,42 @@ def monthly_averages(data: pd.DataFrame, var: str) -> None:
 
     return;
 
+def weekday_averages(data: pd.DataFrame, var: str) -> None:
+    """
+    Plots average values by weekday.
+
+    This function can be used to create weekday average plots for a single variable.
+
+    Parameters
+    ----------
+    data : pd.DataFrame
+        Dataset of interest.
+
+    var : str
+        Variable of interest.
+    """
+
+    errors = data.groupby("weekday")[var].std();
+    data.groupby("weekday")[var].mean().plot(kind="bar", yerr=errors, title=f"{var} weekday average", xlabel="Weekday", ylabel=f"{var}");
+
+    return;
+
+def hourly_averages(data: pd.DataFrame, var: str) -> None:
+    """
+    Plots hourly average values.
+
+    This function can be used to create hourly average plots for a single variable.
+
+    Parameters
+    ----------
+    data : pd.DataFrame
+        Dataset of interest.
+
+    var : str
+        Variable of interest.
+    """
+
+    errors = data.groupby("hour")[var].std();
+    data.groupby("hour")[var].mean().plot(kind="bar", yerr=errors, title=f"Average hourly {var}", xlabel="Hours", ylabel=f"{var}");
+
+    return;
