@@ -4,6 +4,17 @@ import matplotlib.pyplot as plt
 
 """
 This module contains data visualisation functions.
+
+Functions
+---------
+moving_average_plot
+    Plots moving averages together with the original values.
+
+diff_lag_plot
+    Creates a lag plot of a differenced time series.
+
+cross_lag_plot
+    Creates a lag plot of two different variables.
 """
 
 def moving_average_plot(data: pd.DataFrame, vars: list[str], lags: int) -> None:
@@ -36,7 +47,7 @@ def moving_average_plot(data: pd.DataFrame, vars: list[str], lags: int) -> None:
 
 def diff_lag_plot(data: pd.DataFrame, var: str, lag: int) -> None:
     """
-    Plots a lag plot of a differenced time series.
+    Creates a lag plot of a differenced time series.
 
     This function can be used to create a lag plot of a differenced time
     series with a custom number of lags.
@@ -93,8 +104,38 @@ def cross_lag_plot(data: pd.DataFrame, var_x: str, var_y: str, lag_x: int, lag_y
     return;
 
 def cross_diff_lag_plot(data: pd.DataFrame, var_x: str, var_y: str, lag_x: int, lag_y: int) -> None:
+    """
+    Creates a lag plot of two differenced time series.
 
-    pass
+    This function can be used to create a lag plot where the x variable is different from the
+    y variable. Both time series are differenced before the plot is created. The influence of 
+    past variations of an external time series on those of a target series can thus be assessed.
+
+    Parameters
+    ----------
+    data : pd.DataFrame
+        Dataset of interest.
+
+    var_x : str
+        Independent variable.
+
+    var_y : str
+        Dependent variable.
+
+    lag_x : int
+        Lags to consider for the dependent variable.
+
+    lag_y : int
+        Lags to consider for the independent variable.
+    """
+
+    data_x = data[var_x].diff().shift(lag_x).copy();
+    data_y = data[var_y].diff().shift(lag_y).copy();
+
+    pd.concat([data_x, data_y], axis=1).\
+    plot(kind="scatter", x=f"{var_x}", y=f"{var_y}", title=f"Cross differenced lag plot: $\Delta$ {var_x} and $\Delta$ {var_y}", xlabel=f" $\Delta$ {var_x} (t + {lag_x})", ylabel=f"$\Delta$ {var_y} (t + {lag_y})");
+
+    return;
 
 #def recurrence_plot(data: pd.DataFrame, vars: list[str]) -> None:
 
