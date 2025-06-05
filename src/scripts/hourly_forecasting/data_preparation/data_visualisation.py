@@ -8,9 +8,10 @@ This module contains data visualisation functions.
 
 def moving_average_plot(data: pd.DataFrame, vars: list[str], lags: int) -> None:
     """
-    Plot moving averages together with the original values.
+    Plots moving averages together with the original values.
 
-    _extended_summary_
+    This function can be used to create a plot containing the original values of multiple
+    time series and their moving averages.
 
     Parameters
     ----------
@@ -33,17 +34,63 @@ def moving_average_plot(data: pd.DataFrame, vars: list[str], lags: int) -> None:
 
     return;
 
-def smoothing_plot(data: pd.DataFrame, vars: list[str], lags: int, alpha: float) -> None:
-
-    pass
-
 def diff_lag_plot(data: pd.DataFrame, var: str, lag: int) -> None:
+    """
+    Plots a lag plot of a differenced time series.
 
-    pass
+    This function can be used to create a lag plot of a differenced time
+    series with a custom number of lags.
+
+    Parameters
+    ----------
+    data : pd.DataFrame
+        Dataset of interest.
+
+    var : str
+        Variable of interest.
+
+    lag : int
+        Number of lags to consider for lag plot.
+    """
+
+    data_var = data[var].diff().copy();
+    pd.plotting.lag_plot(data_var, lag);
+
+    return;
 
 def cross_lag_plot(data: pd.DataFrame, var_x: str, var_y: str, lag_x: int, lag_y: int) -> None:
+    """
+    Creates a lag plot of two different variables.
 
-    pass
+    This function can be used to create a lag plot where the x variable is different from the
+    y variable. The influence of past values of an external time series on a target series
+    can thus be assessed.
+
+    Parameters
+    ----------
+    data : pd.DataFrame
+        Dataset of interest.
+
+    var_x : str
+        Independent variable.
+
+    var_y : str
+        Dependent variable.
+
+    lag_x : int
+        Lags to consider for the dependent variable.
+
+    lag_y : int
+        Lags to consider for the independent variable.
+    """
+
+    data_x = data[var_x].shift(lag_x).copy();
+    data_y = data[var_y].shift(lag_y).copy();
+
+    pd.concat([data_x, data_y], axis=1).\
+    plot(kind="scatter", x=f"{var_x}", y=f"{var_y}", title=f"Cross lag plot: {var_x} and {var_y}", xlabel=f"{var_x} (t + {lag_x})", ylabel=f"{var_y} (t + {lag_y})");
+
+    return;
 
 def cross_diff_lag_plot(data: pd.DataFrame, var_x: str, var_y: str, lag_x: int, lag_y: int) -> None:
 
