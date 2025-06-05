@@ -137,6 +137,3 @@ def cross_diff_lag_plot(data: pd.DataFrame, var_x: str, var_y: str, lag_x: int, 
 
     return;
 
-#def recurrence_plot(data: pd.DataFrame, vars: list[str]) -> None:
-
-#    pass
