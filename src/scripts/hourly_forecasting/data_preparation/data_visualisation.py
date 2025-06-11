@@ -15,6 +15,24 @@ diff_lag_plot
 
 cross_lag_plot
     Creates a lag plot of two different variables.
+
+cross_diff_lag_plot
+    Creates a lag plot of two differenced time series.
+
+monthly_averages
+    Plots monthly averages.
+
+weekday_averages
+    Plots average values by weekday.
+
+hourly_averages
+    Plots hourly average values.
+
+weekday_per_month
+    Plots weekday average values per month.
+
+hourly_per_month
+    Plots hourly average values per month.
 """
 
 def moving_average_plot(data: pd.DataFrame, vars: list[str], lags: int) -> None:
@@ -95,8 +113,8 @@ def cross_lag_plot(data: pd.DataFrame, var_x: str, var_y: str, lag_x: int, lag_y
         Lags to consider for the independent variable.
     """
 
-    data_x = data[var_x].shift(lag_x).copy();
-    data_y = data[var_y].shift(lag_y).copy();
+    data_x = data[var_x].shift(-lag_x).copy();
+    data_y = data[var_y].shift(-lag_y).copy();
 
     pd.concat([data_x, data_y], axis=1).\
     plot(kind="scatter", x=f"{var_x}", y=f"{var_y}", title=f"Cross lag plot: {var_x} and {var_y}", xlabel=f"{var_x} (t + {lag_x})", ylabel=f"{var_y} (t + {lag_y})");
@@ -129,8 +147,8 @@ def cross_diff_lag_plot(data: pd.DataFrame, var_x: str, var_y: str, lag_x: int, 
         Lags to consider for the independent variable.
     """
 
-    data_x = data[var_x].diff().shift(lag_x).copy();
-    data_y = data[var_y].diff().shift(lag_y).copy();
+    data_x = data[var_x].diff().shift(-lag_x).copy();
+    data_y = data[var_y].diff().shift(-lag_y).copy();
 
     pd.concat([data_x, data_y], axis=1).\
     plot(kind="scatter", x=f"{var_x}", y=f"{var_y}", title=f"Cross differenced lag plot: $\Delta$ {var_x} and $\Delta$ {var_y}", xlabel=f" $\Delta$ {var_x} (t + {lag_x})", ylabel=f"$\Delta$ {var_y} (t + {lag_y})");
@@ -225,9 +243,9 @@ def weekday_per_month(data: pd.DataFrame, var: str) -> None:
 
 def hourly_per_month(data: pd.DataFrame, var: str) -> None:
     """
-    Plots weekday average values per month.
+    Plots hourly average values per month.
 
-    This function can be used to create bar plots that show the weekday average values for each separate month.
+    This function can be used to create bar plots that show the hourly average values for each separate month.
 
     Parameters
     ----------
