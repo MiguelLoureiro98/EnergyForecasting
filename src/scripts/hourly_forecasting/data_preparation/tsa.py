@@ -44,5 +44,13 @@ def stationarity_tests(time_series: pd.Series) -> tuple:
     kpss_values = list(kpss_test[:3]);
     kpss_values.extend([val for val in kpss_test[3].values()]);
     kpss_results = pd.Series(kpss_values, index=kpss_indices);
+
+    print("ADF test results");
+    print("-" * 16);
+    print(adf_results);
+
+    print("\nKPSS test results");
+    print("-" * 17);
+    print(kpss_results);
     
-    return (adf_results, kpss_results);
+    return;
