@@ -13,30 +13,85 @@ NaiveSimilarDay
 """
 
 class NaiveSimilarDay():
+    """
+    Implements the naive similarity-based method.
 
-    def __init__(self, prev_week: pd.DataFrame) -> None:
+    This class implements Nogales' naive similarity-based method for electricity price forecasting.
+    ...
+
+    Parameters
+    ----------
+    test_data : pd.DataFrame
+        ...
+
+    forecasting_vars : list | str, default="price actual"
+        ...
+
+    Methods
+    -------
+    forecast(initial_point: str)
+        ...
+
+    initial_data_point(data: pd.DataFrame)
+        ...
+    """
+
+    def __init__(self, test_data: pd.DataFrame, forecasting_vars: list | str="price actual") -> None:
         
-        self._weekday = prev_week.loc[prev_week["weekday"] == 0].copy();
-        self._saturday = prev_week.loc[prev_week["weekday"] == 5].copy();
-        self._sunday = prev_week.loc[prev_week["weekday"] == 5].copy();
+        self._data = test_data;
+        self._vars = forecasting_vars;
 
         return;
 
-    def forecast(self, data: pd.DataFrame, horizon: int=1) -> np.ndarray | pd.DataFrame:
+    def forecast(self, initial_point: str) -> pd.DataFrame:
+        """
+        _summary_
 
-        current_time = data.tail(1).index[0] + pd.Timedelta(1, unit="h");
-        forecasting_timestamps = pd.date_range(start=current_time, periods=horizon, freq="h");
+        _extended_summary_
 
-        forecast_idx = forecasting_timestamps.to_series();
-        weekday = forecast_idx.dt.weekday;
-        hour = forecast_idx.dt.hour;
-        forecasts = pd.concat([forecast_idx, weekday, hour], axis=1).rename(columns={0: "timestamp", 1: "weekday", 2: "hour"});
+        Parameters
+        ----------
+        initial_point : str
+            _description_
 
-        
+        Returns
+        -------
+        pd.DataFrame
+            _description_
+        """
 
-        return forecasts;
+        data = self._data.copy();
+
+        forecasts = data.shift(24*7);
+        forecasts = forecasts.loc[initial_point:].copy();
+        tuesdays = data.shift(24);
+        wednesdays = data.shift(48);
+        thursdays = data.shift(72);
+        fridays = data.shift(96);
+
+        forecasts.loc[forecasts.weekday == 1] = tuesdays.loc[tuesdays.weekday == 0].loc[initial_point:].replace({"weekday": 0}, 1);
+        forecasts.loc[forecasts.weekday == 2] = wednesdays.loc[wednesdays.weekday == 0].loc[initial_point:].replace({"weekday": 0}, 2);
+        forecasts.loc[forecasts.weekday == 3] = thursdays.loc[thursdays.weekday == 0].loc[initial_point:].replace({"weekday": 0}, 3);
+        forecasts.loc[forecasts.weekday == 4] = fridays.loc[fridays.weekday == 0].loc[initial_point:].replace({"weekday": 0}, 4);
+
+        return forecasts[self._vars].copy();
 
     @staticmethod
-    def prev_week_data(data: pd.DataFrame) -> pd.DataFrame:
+    def initial_data_point(data: pd.DataFrame) -> pd.Timestamp:
+        """
+        _summary_
 
-        pass
+        _extended_summary_
+
+        Parameters
+        ----------
+        data : pd.DataFrame
+            _description_
+
+        Returns
+        -------
+        pd.Timestamp
+            _description_
+        """
+
+        return (data.loc[data.weekday == 0].index[0] + pd.Timedelta(1, "W"));
