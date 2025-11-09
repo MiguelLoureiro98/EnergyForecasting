@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import statsmodels.api as sm
 import torch
+from torch.utils.data import Dataset
 
 """
 This module contains the definitions of all predictive models used for electricity price forecasting.
@@ -10,6 +11,9 @@ Classes
 -------
 NaiveSimilarDay
     Implements the naive similarity-based method.
+
+EPFDataset
+    PyTorch implementation of the dataset used for electricity price forecasting.
 """
 
 class NaiveSimilarDay():
@@ -113,3 +117,68 @@ class NaiveSimilarDay():
         """
 
         return (data.loc[data.weekday == 0].index[0] + pd.Timedelta(1, "W"));
+
+class EPFDataset(Dataset):
+    """
+    PyTorch implementation of the dataset used for electricity price forecasting.
+
+    This class implements the electricity price forecasting dataset using PyTorch. \
+    The number of past lags that will be used to forecast the target variables \
+    can be changed via the n_lags property.
+
+    Parameters
+    ----------
+    data : pd.DataFrame
+        Dataframe containing the dataset.
+
+    targets : list[str] | str, default="price actual"
+        Target or list of targets. The default is "price actual".
+
+    forecasting_vars : list[str] | str, default="price actual"
+        Forecasting variable(s). These are the variables used to \
+        forecast the targets. The default is "price actual".
+
+    lags : int, default=24
+        Number of past lags to consider. The default is 24 (= 1 day).
+
+    Attributes
+    ----------
+    n_lags
+        Number of past lags to consider.
+    """
+
+    def __init__(self, data: pd.DataFrame, 
+                 targets: list[str] | str="price actual", 
+                 forecasting_vars: list[str] | str="price actual",
+                 lags: int=24) -> None:
+
+        super().__init__();
+        self._data = data;
+        self._target_cols = targets;
+        self._features = forecasting_vars;
+        self._n = lags;
+    
+        return;
+
+    @property
+    def n_lags(self) -> int:
+
+        return self._n;
+
+    @n_lags.setter
+    def n_lags(self, lags) -> None:
+
+        self._n = lags;
+
+        return;
+
+    def __len__(self) -> int:
+
+        return self._data.shape[0] - self._n;
+
+    def __getitem__(self, index) -> tuple[torch.Tensor, torch.Tensor]:
+
+        X = self._data[self._features].iloc[index:index+self._n].to_numpy();
+        y = self._data[self._target_cols].iloc[index + self._n];
+
+        return torch.tensor(X), torch.tensor(y);
