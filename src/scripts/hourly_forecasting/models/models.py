@@ -14,6 +14,9 @@ NaiveSimilarDay
 
 EPFDataset
     PyTorch implementation of the dataset used for electricity price forecasting.
+
+LSTM
+    A simple, customisable LSTM model.
 """
 
 class NaiveSimilarDay():
@@ -178,7 +181,62 @@ class EPFDataset(Dataset):
 
     def __getitem__(self, index) -> tuple[torch.Tensor, torch.Tensor]:
 
-        X = self._data[self._features].iloc[index:index+self._n].to_numpy();
-        y = self._data[self._target_cols].iloc[index + self._n];
+        X = self._data[self._features].iloc[index : index + self._n].to_numpy();
+        y = self._data[self._target_cols].iloc[index + self._n].to_numpy();
 
         return torch.tensor(X), torch.tensor(y);
+
+class LSTM(torch.nn.Module):
+    """
+    Simple, customisable LSTM model.
+
+    This class implements a simple LSTM model. Parameters such as the LSTM layers,
+    the number of features the model should consider, or the size of the hidden
+    state should be defined by the user.
+
+    Parameters
+    ----------
+    n_layers : int, default=1
+        Number of LSTM layers.
+
+    n_features : int, default=1
+        Number of features.
+
+    hidden_size : int, default=32
+        LSTM hidden state size.
+
+    Methods
+    -------
+    forward(X: torch.Tensor)
+        Perform the forward pass.
+    """
+
+    def __init__(self, n_layers: int=1, n_features: int=1, hidden_size: int=32) -> None:
+
+        super().__init__();
+        self.lstm_layer = torch.nn.LSTM(n_features, hidden_size, n_layers, batch_first=True);
+        self.linear_layer = torch.nn.Linear(hidden_size, 1);
+
+        return;
+
+    def forward(self, X: torch.Tensor) -> torch.Tensor:
+        """
+        Performs the forward pass.
+
+        This method performs the model's forward pass.
+
+        Parameters
+        ----------
+        X : torch.Tensor
+            Input tensor. Should be of shape (batch, n_obs, n_features).
+
+        Returns
+        -------
+        torch.Tensor
+            Output tensor containing the model's forecasts.
+        """
+
+        x = self.lstm_layer(X);
+        y = self.linear_layer(x);
+
+        return y;
