@@ -157,6 +157,15 @@ class EPFDataset(Dataset):
 
         super().__init__();
         self._data = data;
+
+        if(type(targets) == str):
+
+            targets = [targets];
+        
+        if(type(forecasting_vars) == str):
+
+            forecasting_vars = [forecasting_vars];
+
         self._target_cols = targets;
         self._features = forecasting_vars;
         self._n = lags;
@@ -181,10 +190,18 @@ class EPFDataset(Dataset):
 
     def __getitem__(self, index) -> tuple[torch.Tensor, torch.Tensor]:
 
-        X = self._data[self._features].iloc[index : index + self._n].to_numpy();
-        y = self._data[self._target_cols].iloc[index + self._n].to_numpy();
+        X = torch.tensor(self._data[self._features].iloc[index : index + self._n].to_numpy());
+        y = torch.tensor(self._data[self._target_cols].iloc[index + self._n].to_numpy());
 
-        return torch.tensor(X), torch.tensor(y);
+        #if(len(self._features) == 1):
+
+        #    X = torch.unsqueeze(X, 1);
+        
+        #if(len(self._target_cols) == 1):
+
+        #    y = torch.unsqueeze(y, 1);
+
+        return X, y;
 
 class LSTM(torch.nn.Module):
     """
@@ -236,7 +253,112 @@ class LSTM(torch.nn.Module):
             Output tensor containing the model's forecasts.
         """
 
-        x = self.lstm_layer(X);
+        x, _ = self.lstm_layer(X);
+        x = x[:, -1, :];
         y = self.linear_layer(x);
 
         return y;
+
+def _train_one_epoch(model: LSTM, 
+                     loader: torch.utils.data.DataLoader, 
+                     loss_fcn: torch.nn.MSELoss, 
+                     optimiser: torch.optim.Adam,
+                     device: torch.device) -> float:
+    
+    """Runs a single training epoch."""
+
+    running_loss = 0;
+
+    for X, y in loader:
+
+        X, y = X.to(device), y.to(device);
+
+        optimiser.zero_grad();
+        preds = model(X);
+    
+        loss = loss_fcn(preds, y);
+        loss.backward();
+        optimiser.step();
+    
+        running_loss += loss;
+
+    return running_loss;
+
+def _validation(model: LSTM,
+                loader: torch.utils.data.DataLoader, 
+                loss_fcn: torch.nn.MSELoss, 
+                device: torch.device) -> float:
+
+    """Computes the validation loss for a single epoch."""
+
+    val_loss = 0;
+
+    with torch.no_grad():
+
+        for X, y in loader:
+
+            X, y = X.to(device), y.to(device);
+
+            preds = model(X);
+            val_loss += loss_fcn(preds, y);
+
+    return val_loss;
+
+def model_training(model: LSTM, 
+                   device: torch.device, 
+                   training_loader: torch.utils.data.DataLoader,
+                   validation_loader: torch.utils.data.DataLoader,
+                   loss_fcn: torch.nn.MSELoss,
+                   optimiser: torch.optim.Adam,
+                   epochs: int=200) -> tuple[np.ndarray]:
+    """
+    Executes the model training procedure.
+
+    Parameters
+    ----------
+    model : LSTM
+        An instance of the LSTM model class. 
+        Should be moved to the correct device before calling this function.
+
+    device : torch.device
+        Device where training should be performed.
+
+    training_loader : torch.utils.data.DataLoader
+        Training set DataLoader.
+
+    validation_loader : torch.utils.data.DataLoader
+        Validation set DataLoader.
+
+    loss_fcn : torch.nn.MSELoss
+        Loss function.
+
+    optimiser : torch.optim.Adam
+        Optimiser.
+
+    epochs : int, default=200
+        Number of epochs.
+
+    Returns
+    -------
+    tuple[np.ndarray]
+        Tuple containing the arrays of training and validation losses.
+    """
+    
+    #model.to(device);
+
+    training_loss = torch.zeros((epochs, 1), dtype=torch.float64, device=device);
+    validation_loss = torch.zeros((epochs, 1), dtype=torch.float64, device=device);
+
+    for epoch in range(epochs):
+
+        model.train();
+
+        training_loss[epoch] = _train_one_epoch(model, training_loader, loss_fcn, optimiser, device) / len(training_loader.dataset);
+    
+        model.eval();
+
+        validation_loss[epoch] = _validation(model, validation_loader, loss_fcn, device) / len(validation_loader.dataset);
+    
+        print(f"Finished epoch {epoch+1} of {epochs}.");
+
+    return training_loss, validation_loss;
